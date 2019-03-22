@@ -2,11 +2,11 @@ def solve(s):
     temp = list(s)
     counter = 0
     for i, char in enumerate(temp):
-        if counter == 0:
-            temp[i]=temp[i].upper()
-            counter = 1
-        elif char == " ":
+        if char == " ":
             counter = 0
+        elif counter == 0:
+            temp[i]=temp[i].upper()
+            counter = 1   
     return ("".join(temp))
 
 if __name__ == '__main__':
@@ -19,3 +19,4 @@ if __name__ == '__main__':
     fptr.write(result + '\n')
 
     fptr.close()
+
