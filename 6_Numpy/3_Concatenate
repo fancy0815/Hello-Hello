@@ -1,0 +1,17 @@
+import numpy as np
+
+N,M,P = map(int,input().split())
+
+arrA = []
+for _ in range(N):
+    arrA += [list(map(int,input().split()))]
+arrN = np.array(arrA,int)
+
+arrM = np.array([input().split() for _ in range(M)],int)
+
+print(np.concatenate((arrN,arrM),axis=0))
+
+
+# axis=1意思是沿着column左右拼接。axis = 0意思是row by row上下拼接
+# axis = 0 means column number must match to each other
+# axis = 1 means row number must match to each other
