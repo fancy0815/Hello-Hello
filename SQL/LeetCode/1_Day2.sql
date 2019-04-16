@@ -167,15 +167,113 @@ Note:
 The seat_id is an auto increment int, and free is bool ('1' means free, and '0' means occupied.).
 Consecutive available seats are more than 2(inclusive) seats consecutively available.
 ⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------
+SELECT DISTINCT t1.seat_id
+FROM cinema t1, cinema t2
+WHERE abs(t1.seat_id - t2.seat_id) = 1 and t1.free = 1 and t2.free = 1
+ORDER BY t1.seat_id
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+607 Sales Person
+Description
+
+Given three tables: salesperson, company, orders.
+Output all the names in the table salesperson, who didn’t have sales to company 'RED'.
+
+Example
+Input
+
+Table: salesperson
+
++----------+------+--------+-----------------+-----------+
+| sales_id | name | salary | commission_rate | hire_date |
++----------+------+--------+-----------------+-----------+
+|   1      | John | 100000 |     6           | 4/1/2006  |
+|   2      | Amy  | 120000 |     5           | 5/1/2010  |
+|   3      | Mark | 65000  |     12          | 12/25/2008|
+|   4      | Pam  | 25000  |     25          | 1/1/2005  |
+|   5      | Alex | 50000  |     10          | 2/3/2007  |
++----------+------+--------+-----------------+-----------+
+The table salesperson holds the salesperson information. Every salesperson has a sales_id and a name.
+Table: company
+
++---------+--------+------------+
+| com_id  |  name  |    city    |
++---------+--------+------------+
+|   1     |  RED   |   Boston   |
+|   2     | ORANGE |   New York |
+|   3     | YELLOW |   Boston   |
+|   4     | GREEN  |   Austin   |
++---------+--------+------------+
+The table company holds the company information. Every company has a com_id and a name.
+Table: orders
+
++----------+------------+---------+----------+--------+
+| order_id | order_date | com_id  | sales_id | amount |
++----------+------------+---------+----------+--------+
+| 1        |   1/1/2014 |    3    |    4     | 100000 |
+| 2        |   2/1/2014 |    4    |    5     | 5000   |
+| 3        |   3/1/2014 |    1    |    1     | 50000  |
+| 4        |   4/1/2014 |    1    |    4     | 25000  |
++----------+----------+---------+----------+--------+
+The table orders holds the sales record information, salesperson and customer company are represented by sales_id and com_id.
+output
+
++------+
+| name | 
++------+
+| Amy  | 
+| Mark | 
+| Alex |
++------+
+Explanation
+
+According to order '3' and '4' in table orders, it is easy to tell only salesperson 'John' and 'Alex' have sales to company 'RED',
+so we need to output all the other names in table salesperson.
+
+⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------
+SELECT S.Name
+FROM salesperson AS s
+WHERE s.sales_id not in
+    (
+    Select o.sales_id
+    FROM orders AS O
+    JOIN company AS c
+    ON o.com_id = c.com_id and c.name = 'RED'
+    )
 
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+610. Triangle Judgement
+A pupil Tim gets homework to identify whether three line segments could possibly form a triangle.
+However, this assignment is very heavy because there are hundreds of records to calculate.
+Could you help Tim by writing a query to judge whether these three sides can form a triangle, assuming table triangle holds the length of the three sides x, y and z.
+ 
+
+| x  | y  | z  |
+|----|----|----|
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
+For the sample data above, your query should return the follow result:
+| x  | y  | z  | triangle |
+|----|----|----|----------|
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
 
 
+⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------⚡️--------------
+SELECT x,y,z
+CASE
+    WHEN x+y>z and x+z>y and y+z>x THEN 'Yes'
+    ELSE 'No'
+END AS triangle
+FROM triangle
 
 
-
-
-
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+620. Not Boring Movies
+https://leetcode.com/problems/not-boring-movies/
+SELECT id,movie,description,rating
+FROM cinema
+WHERE id % 2 = 1 and description != 'boring'
+ORDER BY rating DESC
 
