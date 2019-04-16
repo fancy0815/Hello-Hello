@@ -143,7 +143,7 @@ SELECT ROUND(
   ,0)
   ,2) AS accept_rate
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Consecutive Available Seats 
+180. Consecutive Available Seats 
 Several friends at a cinema ticket office would like to reserve consecutive available seats.
 Can you help to query all the consecutive available seats order by the seat_id using the following cinema table?
 | seat_id | free |
