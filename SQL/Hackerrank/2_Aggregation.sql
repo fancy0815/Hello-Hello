@@ -88,7 +88,16 @@ SELECT ROUND(
 FROM station
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #42 Weather Observation Station 20
-
+SELECT ROUND(s2.lat_n,4) 
+FROM station s2
+WHERE 
+    (SELECT COUNT(s.lat_n)
+     FROM station s
+     WHERE s.lat_n < s2.lat_n)
+     =
+     (SELECT COUNT(s.lat_n)
+     FROM station s
+     WHERE s.lat_n > s2.lat_n)
 
 
 
