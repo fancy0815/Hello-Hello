@@ -31,4 +31,14 @@ HAVING total = (SELECT COUNT(*)
  
 ORDER BY total DESC, h.hacker_id
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#50
+#50 Contest Leaderboard
+SELECT h.hacker_id,h.name,SUM(max)
+FROM hackers AS h
+INNER JOIN 
+    (SELECT s.hacker_id,MAX(s.score) AS max
+     FROM submissions AS s
+     GROUP BY s.challenge_id, s.hacker_id) AS high_score
+ON h.hacker_id = high_score.hacker_id 
+GROUP BY h.hacker_id, h.name
+HAVING SUM(max)!=0
+ORDER BY SUM(max) DESC, h.hacker_id
