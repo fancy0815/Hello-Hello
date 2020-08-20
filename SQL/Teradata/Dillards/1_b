@@ -1,0 +1,98 @@
+3.
+SELECT saledate, SUM(amt)
+FROM trnsact
+WHERE stype='P'
+GROUP BY saledate
+ORDER BY SUM(amt) DESC;
+
+#4/12/18
+
+4.
+SELECT dep.deptdesc,COUNT(*)
+FROM skuinfo sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+GROUP BY dep.deptdesc
+ORDER BY COUNT(*) DESC;
+
+6.
+SELECT COUNT(DISTINCT sks.sku)
+FROM skstinfo sks
+LEFT JOIN skuinfo sku ON sks.sku=sku.sku
+WHERE sku.sku IS NULL;
+
+#0
+
+7. 
+SELECT SUM(trn.amt-sks.cost*trn.quantity)/COUNT(DISTINCT trn.saledate) AS Avg_Profit
+FROM trnsact trn
+JOIN skstinfo sks
+ON sks.sku=trn.sku AND sks.store=trn.store
+WHERE trn.stype='P';
+
+#1527903.46
+
+8. 
+SELECT COUNT(*),MIN(msa_pop),MAX(msa_income)
+FROM store_msa
+WHERE state='NC';
+
+#36151
+
+9.
+SELECT dep.dept, dep.deptdesc,sku.brand,sku.style,sku.color,SUM(trn.amt)
+FROM trnsact trn
+JOIN skuinfo sku ON trn.sku=sku.sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+WHERE trn.stype='p'
+GROUP BY dep.dept, dep.deptdesc,sku.brand,sku.style,sku.color
+ORDER BY SUM(trn.amt) DESC;
+
+10.
+SELECT COUNT(*)
+FROM 
+    (SELECT store, COUNT(DISTINCT sku) as Num
+     FROM skstinfo
+     GROUP BY store) as C
+WHERE c.num>180000;
+
+#12
+
+11.
+SELECT *
+FROM skuinfo sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+WHERE dep.deptdesc='cop' AND brand='federal' AND color='rinse wash';
+
+12.
+SELECT COUNT(DISTINCT sku.sku)
+FROM skuinfo sku
+LEFT JOIN skstinfo sks ON sku.sku=sks.sku
+WHERE sks.sku IS NULL;
+
+#803966
+
+13.
+SELECT trn.store, str.city, str.state, SUM(trn.amt)
+FROM trnsact trn
+JOIN strinfo str ON trn.store=str.store
+WHERE trn.stype='P'
+GROUP BY trn.store, str.city, str.state
+ORDER BY SUM(trn.amt) DESC;
+
+15.
+SELECT COUNT(*)
+FROM
+    (SELECT state,COUNT(DISTINCT store) AS num
+     FROM strinfo
+     GROUP BY state) AS c
+WHERE c.num>10;
+
+#15
+
+16.
+SELECT sks.sku, sks.retail, dep.deptdesc, sku.brand,sku.color
+FROM skstinfo sks
+JOIN skuinfo sku ON sks.sku=sku.sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+WHERE dep.deptdesc='reebok' AND sku.brand='skechers' AND sku.color='wht/saphire';
+
