@@ -1,0 +1,165 @@
+Exercise 1: (a) Use COUNT and DISTINCT to determine how many distinct skus there are in pairs of the
+skuinfo, skstinfo, and trnsact tables. Which skus are common to pairs of tables, or unique to specific
+tables?
+
+SELECT COUNT(DISTINCT sku)
+FROM skuinfo;
+
+1564178
+
+SELECT COUNT(DISTINCT sku)
+FROM skstinfo;
+
+760212
+
+SELECT COUNT(DISTINCT sku)
+FROM trnsact;
+
+714499
+
+SELECT COUNT(DISTINCT s.sku)
+FROM skuinfo s,skstinfo k
+WHERE s.sku=k.sku;
+
+760212
+
+SELECT COUNT(DISTINCT k.sku)
+FROM skstinfo k,trnsact t
+WHERE t.sku=k.sku;
+
+542513
+
+SELECT COUNT(DISTINCT t.sku)
+FROM trnsact t,skuinfo s
+WHERE t.sku=s.sku;
+
+714499
+
+
+1(b)
+Use COUNT to determine how many instances there are of each sku associated with each store in the
+skstinfo table and the trnsact table?
+
+SELECT COUNT(*)
+FROM skstinfo k,trnsact t
+WHERE k.sku=t.sku AND k.store=t.store
+
+68578056
+
+2(a)
+SELECT COUNT(DISTINCT store)
+FROM skstinfo; 
+
+357
+
+SELECT COUNT(DISTINCT store)
+FROM trnsact;
+
+332
+
+(b) Which stores are common to all four tables, or unique to specific tables?
+
+SELECT DISTINCT sks.store
+FROM strinfo str
+JOIN store_msa sto ON str.store=sto.store
+JOIN skstinfo sks ON str.store=sks.store
+JOIN trnsact trn ON str.store=trn.store;
+
+Exercise 3: It turns out there are many skus in the trnsact table that are not in the skstinfo table. As a
+consequence, we will not be able to complete many desirable analyses of Dillard’s profit, as opposed to
+revenue, because we do not have the cost information for all the skus in the transact table (recall that
+profit = revenue - cost). Examine some of the rows in the trnsact table that are not in the skstinfo table;
+can you find any common features that could explain why the cost information is missing?
+
+SELECT *
+FROM trnsact trn
+LEFT JOIN skstinfo sks
+ON trn.sku=sks.sku
+WHERE sks.sku IS NULL
+
+Exercise 4: Although we can’t complete all the analyses we’d like to on Dillard’s profit, we can look at
+general trends. What is Dillard’s average profit per day?
+
+SELECT trn.register, SUM(trn.amt-sks.cost*trn.quantity)/COUNT(DISTINCT trn.saledate) AS Avg_Profit
+FROM trnsact trn
+JOIN skstinfo sks
+ON sks.sku=trn.sku AND sks.store=trn.store
+WHERE trn.stype='P'
+GROUP BY trn.register
+ORDER BY trn.register;
+
+Exercise 5: On what day was the total value (in $) of returned goods the greatest? On what day was the
+total number of individual returned items the greatest?
+
+SELECT saledate, SUM(amt)
+FROM trnsact
+WHERE stype='R'
+GROUP BY saledate
+ORDER BY SUM(amt) DESC;
+
+4/12/27 3030259.76
+
+SELECT saledate, COUNT(quantity)
+FROM trnsact
+WHERE stype='R'
+GROUP BY saledate
+ORDER BY COUNT(quantity) DESC;
+
+4/12/27 82512
+
+Exercise 6: What is the maximum price paid for an item in our database? What is the minimum price
+paid for an item in our database?
+
+SELECT MAX(sprice)
+FROM trnsact;
+
+6017
+
+SELECT MIN(sprice)
+FROM trnsact;
+
+0
+
+Exercise 7: How many departments have more than 100 brands associated with them, and what are their
+descriptions?
+
+SELECT sku.dept, COUNT(DISTINCT sku.brand) as Num_Brand, dep.deptdesc
+FROM skuinfo sku
+JOIN deptinfo.dep ON sku.dept=dep.dept
+GROUP BY sku.dept
+HAVING Num_Brand>100;
+
+ 
+
+Exercise 8: Write a query that retrieves the department descriptions of each of the skus in the skstinfo
+table.
+SELECT DISTINCT sks.sku, sku.dept, dep.deptdesc
+FROM skstinfo sks
+JOIN skuinfo sku ON sks.sku=sku.sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+WHERE sks.sku=5020024;
+
+5020024 801 LESLIE
+
+Exercise 9: What department (with department description), brand, style, and color had the greatest total
+value of returned items?
+
+SELECT dep.dept, dep.deptdesc,sku.brand,sku.style,sku.color,SUM(trn.amt)
+FROM trnsact trn
+JOIN skuinfo sku ON trn.sku=sku.sku
+JOIN deptinfo dep ON sku.dept=dep.dept
+WHERE trn.stype='R'
+GROUP BY dep.dept, dep.deptdesc,sku.brand,sku.style,sku.color
+ORDER BY SUM(trn.amt) DESC;
+
+Exercise 10: In what state and zip code is the store that had the greatest total revenue during the time
+period monitored in our dataset?
+
+SELECT sto.state,sto.city,sto.zip,SUM(trn.amt)
+FROM store_msa sto
+JOIN trnsact trn ON sto.store=trn.store
+WHERE trn.stype='P'
+GROUP BY sto.state,sto.city,sto.zip
+ORDER BY SUM(trn.amt) DESC;
+
+
