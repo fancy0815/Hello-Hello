@@ -371,3 +371,92 @@ LEFT JOIN activity a2
 ON a1.player_id=a2.player_id
 AND a1.first_login+1=a2.event_date
 *>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>
+1454. Active Users
+
+Table Accounts:
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| name          | varchar |
++---------------+---------+
+the id is the primary key for this table.
+This table contains the account id and the user name of each account.
+ 
+
+Table Logins:
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| login_date    | date    |
++---------------+---------+
+There is no primary key for this table, it may contain duplicates.
+This table contains the account id of the user who logged in and the login date. A user may log in multiple times in the day.
+********************************************************************************************************************************
+SELECT DISTINCT l1.id,a.name
+FROM
+     (SELECT t.id
+            ,t.login_date 
+            ,LEAD(t.login_date,4) OVER (PARTITION BY t.id ORDER BY t.login_date) AS aa
+      FROM (SELECT DISTINCT * FROM Logins) AS t ) AS l1
+JOIN Accounts a
+ON l1.id=a.id
+WHERE DATEDIFF(l1.aa,l1.login_date)=4
+ORDER BY a.id;
+*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>*>
+1205. Monthly Transactions II
+Medium
+
+54
+
+119
+
+Add to List
+
+Share
+SQL Schema
+Table: Transactions
+
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| id             | int     |
+| country        | varchar |
+| state          | enum    |
+| amount         | int     |
+| trans_date     | date    |
++----------------+---------+
+id is the primary key of this table.
+The table has information about incoming transactions.
+The state column is an enum of type ["approved", "declined"].
+Table: Chargebacks
+
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| trans_id       | int     |
+| charge_date    | date    |
++----------------+---------+
+Chargebacks contains basic information regarding incoming chargebacks from some transactions placed in Transactions table.
+trans_id is a foreign key to the id column of Transactions table.
+Each chargeback corresponds to a transaction made previously even if they were not approved.
+ 
+
+Write an SQL query to find for each month and country, the number of approved transactions and their total amount, the number of chargebacks and their total amount.
+********************************************************************************************************************************
+ SELECT MONTH, country,
+    sum( type = 'approved' ) approved_count,
+    sum( ( type = 'approved' ) * amount ) approved_amount,
+    sum( type = 'chargeback' ) chargeback_count,
+    sum( ( type = 'chargeback' ) * amount ) chargeback_amount 
+ FROM
+     ( SELECT DATE_FORMAT( c.trans_date, '%Y-%m' ) MONTH, country, amount, 'chargeback' type 
+       FROM transactions t JOIN chargebacks c ON t.id = c.trans_id 
+       UNION ALL
+      SELECT DATE_FORMAT( trans_date, '%Y-%m' ) MONTH, country, amount, 'approved' type 
+      FROM transactions WHERE state = 'approved' 
+    ) tmp 
+   GROUP BY MONTH, country
